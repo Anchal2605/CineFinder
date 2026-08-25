@@ -1,8 +1,10 @@
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
+
 const Signup = () => {
+  
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -250,12 +252,15 @@ const Signup = () => {
               </div>
 
               {/* Signup Button */}
+               
+               <Link to="/dashboard">
               <button
                 type="submit"
                 className="h-14 w-full rounded-xl bg-[#e50914] text-base font-semibold text-white transition hover:bg-red-700 hover:shadow-[0_0_25px_rgba(229,9,20,0.25)]"
               >
                 Create Account
               </button>
+              </Link>
 
             </form>
 

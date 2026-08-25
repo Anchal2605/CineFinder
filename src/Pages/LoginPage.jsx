@@ -242,7 +242,7 @@ const LoginPage = () => {
 
 
               {/* Login Button */}
-             
+             <Link to ="/dashboard">
               <button
                 className="
                   w-full
@@ -259,6 +259,7 @@ const LoginPage = () => {
               >
                 Login
               </button>
+              </Link>
               
 
 
