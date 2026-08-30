@@ -1,31 +1,131 @@
 import { useState } from "react";
-import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
 
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  ArrowLeft,
+} from "lucide-react";
+
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+  // Password show/hide
   const [showPassword, setShowPassword] = useState(false);
+
+  // Form values
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Error messages
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
+
+  const navigate = useNavigate();
+
+  // ================= FORM SUBMIT =================
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const newErrors = {
+      email: "",
+      password: "",
+    };
+
+    // ================= EMAIL VALIDATION =================
+
+    if (email.trim() === "") {
+      newErrors.email = "Please enter your email";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // ================= PASSWORD VALIDATION =================
+
+    if (password.trim() === "") {
+      newErrors.password = "Please enter your password";
+    } else if (password.length < 8) {
+      newErrors.password =
+        "Password must be at least 8 characters";
+    }
+
+    // Validation errors screen par show karo
+    setErrors(newErrors);
+
+    // Agar validation error hai to login check mat karo
+    if (newErrors.email || newErrors.password) {
+      return;
+    }
+
+    // ================= GET SAVED USER =================
+
+    const savedUser = JSON.parse(
+      localStorage.getItem("user")
+    );
+
+    // ================= ACCOUNT NOT FOUND =================
+
+    if (!savedUser) {
+      setErrors({
+        email: "Account not found. Please sign up first.",
+        password: "",
+      });
+
+      return;
+    }
+
+    // ================= EMAIL CHECK =================
+
+    if (email.trim() !== savedUser.email) {
+      setErrors({
+        email: "Account not found. Please sign up first.",
+        password: "",
+      });
+
+      return;
+    }
+
+    // ================= PASSWORD CHECK =================
+
+    if (password !== savedUser.password) {
+      setErrors({
+        email: "",
+        password: "Incorrect password",
+      });
+
+      return;
+    }
+
+    // ================= LOGIN SUCCESS =================
+
+    localStorage.setItem("isLoggedIn", "true");
+
+    navigate("/dashboard");
+  };
 
   return (
     <div className="min-h-screen bg-[#050505] text-white relative overflow-hidden">
 
-      {/* Subtle Red Glow */}
+      {/* ================= RED GLOW ================= */}
+
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-red-600/10 blur-[140px] rounded-full" />
 
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-red-600/10 blur-[140px] rounded-full" />
 
+      {/* ================= MAIN ================= */}
 
-      {/* Main Content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center px-5 py-10">
 
         <div className="w-full max-w-[1050px] grid md:grid-cols-2 border border-white/10 rounded-2xl overflow-hidden bg-black/30 backdrop-blur-sm">
-
 
           {/* ================= LEFT SIDE ================= */}
 
           <div className="hidden md:flex relative flex-col justify-center px-12 lg:px-16 py-16 border-r border-white/10">
 
-            {/* Small Red Line */}
             <div className="w-12 h-[2px] bg-[#F20A16] mb-7" />
 
             <p className="text-[#F20A16] text-sm font-medium tracking-wide mb-4">
@@ -35,6 +135,7 @@ const LoginPage = () => {
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight mb-6">
               Find Your
               <br />
+
               <span className="text-[#F20A16]">
                 Next Movie.
               </span>
@@ -46,8 +147,8 @@ const LoginPage = () => {
               to watch tonight.
             </p>
 
+            {/* Stats */}
 
-            {/* Small Stats */}
             <div className="flex gap-10 mt-12 pt-8 border-t border-white/10">
 
               <div>
@@ -60,7 +161,6 @@ const LoginPage = () => {
                 </p>
               </div>
 
-
               <div>
                 <p className="text-2xl font-bold text-white">
                   50+
@@ -70,7 +170,6 @@ const LoginPage = () => {
                   Genres
                 </p>
               </div>
-
 
               <div>
                 <p className="text-2xl font-bold text-white">
@@ -83,9 +182,7 @@ const LoginPage = () => {
               </div>
 
             </div>
-
           </div>
-
 
           {/* ================= RIGHT SIDE ================= */}
 
@@ -93,24 +190,25 @@ const LoginPage = () => {
 
             <div className="w-full max-w-md">
 
-
-              {/* Logo */}
+              {/* ================= LOGO ================= */}
 
               <div className="mb-10">
 
                 <h2 className="text-2xl font-bold tracking-wide">
+
                   <span className="text-[#F20A16]">
                     CINE
                   </span>
+
                   <span className="text-white">
                     FINDER
                   </span>
+
                 </h2>
 
               </div>
 
-
-              {/* Heading */}
+              {/* ================= HEADING ================= */}
 
               <div className="mb-8">
 
@@ -124,146 +222,197 @@ const LoginPage = () => {
 
               </div>
 
+              {/* ================= FORM ================= */}
 
-              {/* ================= EMAIL ================= */}
+              <form onSubmit={handleSubmit}>
 
-              <div className="mb-5">
+                {/* ================= EMAIL ================= */}
 
-                <label className="block text-sm text-gray-300 mb-2">
-                  Email Address
-                </label>
+                <div className="mb-5">
 
-                <div className="relative">
+                  <label className="block text-sm text-gray-300 mb-2">
+                    Email Address
+                  </label>
 
-                  <Mail
-                    size={18}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
-                  />
+                  <div className="relative">
 
-                  <input
-                    type="email"
-                    placeholder="you@example.com"
-                    className="
-                      w-full
-                      h-12
-                      bg-[#080808]
-                      border border-white/10
-                      rounded-lg
-                      pl-11 pr-4
-                      text-white
-                      placeholder:text-gray-600
-                      outline-none
-                      transition
-                      focus:border-[#F20A16]
-                    "
-                  />
+                    <Mail
+                      size={18}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                    />
+
+                    <input
+                      type="text"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+
+                        setErrors({
+                          ...errors,
+                          email: "",
+                        });
+                      }}
+                      className={`
+                        w-full
+                        h-12
+                        bg-[#080808]
+                        border
+                        rounded-lg
+                        pl-11
+                        pr-4
+                        text-white
+                        placeholder:text-gray-600
+                        outline-none
+                        transition
+                        ${
+                          errors.email
+                            ? "border-red-600"
+                            : "border-white/10 focus:border-[#F20A16]"
+                        }
+                      `}
+                    />
+
+                  </div>
+
+                  {/* EMAIL ERROR */}
+
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-2">
+                      {errors.email}
+                    </p>
+                  )}
 
                 </div>
 
-              </div>
+                {/* ================= PASSWORD ================= */}
 
+                <div className="mb-4">
 
-              {/* ================= PASSWORD ================= */}
+                  <label className="block text-sm text-gray-300 mb-2">
+                    Password
+                  </label>
 
-              <div className="mb-4">
+                  <div className="relative">
 
-                <label className="block text-sm text-gray-300 mb-2">
-                  Password
-                </label>
+                    <Lock
+                      size={18}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                    />
 
-                <div className="relative">
+                    <input
+                      type={
+                        showPassword
+                          ? "text"
+                          : "password"
+                      }
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
 
-                  <Lock
-                    size={18}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
-                  />
+                        setErrors({
+                          ...errors,
+                          password: "",
+                        });
+                      }}
+                      className={`
+                        w-full
+                        h-12
+                        bg-[#080808]
+                        border
+                        rounded-lg
+                        pl-11
+                        pr-12
+                        text-white
+                        placeholder:text-gray-600
+                        outline-none
+                        transition
+                        ${
+                          errors.password
+                            ? "border-red-600"
+                            : "border-white/10 focus:border-[#F20A16]"
+                        }
+                      `}
+                    />
 
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    className="
-                      w-full
-                      h-12
-                      bg-[#080808]
-                      border border-white/10
-                      rounded-lg
-                      pl-11 pr-12
-                      text-white
-                      placeholder:text-gray-600
-                      outline-none
-                      transition
-                      focus:border-[#F20A16]
-                    "
-                  />
+                    {/* SHOW PASSWORD */}
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowPassword(!showPassword)
+                      }
+                      className="
+                        absolute
+                        right-4
+                        top-1/2
+                        -translate-y-1/2
+                        text-gray-500
+                        hover:text-white
+                        transition
+                      "
+                    >
+                      {showPassword ? (
+                        <EyeOff size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                    </button>
+
+                  </div>
+
+                  {/* PASSWORD ERROR */}
+
+                  {errors.password && (
+                    <p className="text-red-500 text-xs mt-2">
+                      {errors.password}
+                    </p>
+                  )}
+
+                </div>
+
+                {/* ================= FORGOT PASSWORD ================= */}
+
+                <div className="flex justify-end mb-7">
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowPassword(!showPassword)
-                    }
                     className="
-                      absolute
-                      right-4
-                      top-1/2
-                      -translate-y-1/2
+                      text-sm
                       text-gray-500
-                      hover:text-white
+                      hover:text-[#F20A16]
                       transition
                     "
                   >
-                    {showPassword ? (
-                      <EyeOff size={18} />
-                    ) : (
-                      <Eye size={18} />
-                    )}
+                    Forgot password?
                   </button>
 
                 </div>
 
-              </div>
-
-
-              {/* Forgot Password */}
-
-              <div className="flex justify-end mb-7">
+                {/* ================= LOGIN BUTTON ================= */}
 
                 <button
+                  type="submit"
                   className="
-                    text-sm
-                    text-gray-500
-                    hover:text-[#F20A16]
+                    w-full
+                    h-12
+                    bg-[#F20A16]
+                    hover:bg-[#D90813]
+                    text-white
+                    font-semibold
+                    rounded-lg
                     transition
+                    shadow-lg
+                    shadow-red-950/30
                   "
                 >
-                  Forgot password?
+                  Login
                 </button>
 
-              </div>
+              </form>
 
-
-              {/* Login Button */}
-             <Link to ="/dashboard">
-              <button
-                className="
-                  w-full
-                  h-12
-                  bg-[#F20A16]
-                  hover:bg-[#D90813]
-                  text-white
-                  font-semibold
-                  rounded-lg
-                  transition
-                  shadow-lg
-                  shadow-red-950/30
-                "
-              >
-                Login
-              </button>
-              </Link>
-              
-
-
-              {/* Divider */}
+              {/* ================= DIVIDER ================= */}
 
               <div className="flex items-center gap-4 my-7">
 
@@ -277,14 +426,15 @@ const LoginPage = () => {
 
               </div>
 
-
-              {/* Google */}
+              {/* ================= GOOGLE ================= */}
 
               <button
+                type="button"
                 className="
                   w-full
                   h-12
-                  border border-white/10
+                  border
+                  border-white/10
                   bg-white/[0.02]
                   rounded-lg
                   text-gray-300
@@ -297,25 +447,21 @@ const LoginPage = () => {
                   gap-3
                 "
               >
-
                 <span className="font-bold text-white">
                   G
                 </span>
 
                 Continue with Google
-
               </button>
 
-
-              {/* Signup */}
+              {/* ================= SIGN UP ================= */}
 
               <p className="text-center text-sm text-gray-500 mt-7">
 
                 Don't have an account?{" "}
-                 
-                 
-                <Link to="/Signup">
-                <button
+
+                <Link
+                  to="/signup"
                   className="
                     text-white
                     hover:text-[#F20A16]
@@ -324,15 +470,14 @@ const LoginPage = () => {
                   "
                 >
                   Sign Up
-                </button>
                 </Link>
-               
+
               </p>
 
+              {/* ================= BACK HOME ================= */}
 
-              {/* Back */}
-
-              <button
+              <Link
+                to="/"
                 className="
                   flex
                   items-center
@@ -343,14 +488,12 @@ const LoginPage = () => {
                   text-gray-600
                   hover:text-[#F20A16]
                   transition
+                  w-fit
                 "
               >
-
                 <ArrowLeft size={15} />
-
                 Back to Home
-
-              </button>
+              </Link>
 
             </div>
 
@@ -365,3 +508,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
