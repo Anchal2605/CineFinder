@@ -1,16 +1,54 @@
-# React + Vite
+# CineFinder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive movie discovery web application built with React. CineFinder allows users to explore popular movies through data fetched from the TMDB API and provides a modern, cinematic user interface.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+CineFinder is a frontend movie discovery application designed to help users browse and explore movies in a clean and responsive interface.
 
-## React Compiler
+The application integrates with the TMDB API to fetch real-time movie data, including movie titles, posters, release dates, and ratings.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- Browse popular movies
+- Fetch real movie data using the TMDB API
+- Display movie posters, titles, ratings, and release years
+- Select movies and update the featured movie section
+- User authentication interface with Login and Signup pages
+- Protected route implementation
+- Responsive design for mobile, tablet, and desktop
+- Modern cinematic user interface
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Tech Stack
+
+**Frontend**
+- React
+- Vite
+- Tailwind CSS
+
+**Libraries**
+- React Router DOM
+- Axios
+- Lucide React
+
+**API**
+- TMDB API
+
+## Application Flow
+
+```text
+Landing Page
+     ↓
+Login / Signup
+     ↓
+Dashboard
+     ↓
+TMDB API Request
+     ↓
+Movie Data
+     ↓
+Movie Cards
+     ↓
+Select a Movie
+     ↓
+Featured Movie Section Updates
