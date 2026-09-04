@@ -51,8 +51,8 @@ const Signup = () => {
     // Password validation
     if (!formData.password) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     // Confirm password validation
@@ -77,12 +77,27 @@ const Signup = () => {
     email: formData.email,
     password: formData.password,
   };
+    
+  const users = JSON.parse(localStorage.getItem("users")) || [];
 
-  // Save user data in localStorage
-  localStorage.setItem("user", JSON.stringify(userData));
+const emailExists = users.some(
+  (users) => users.email === formData.email.trim()
+);
 
-  // Go to dashboard
-      navigate("/dashboard");
+if (emailExists) {
+  setErrors({
+    email: "An account with this email already exists.",
+  });
+  return;
+}
+
+users.push(userData);
+
+localStorage.setItem("users", JSON.stringify(users));
+localStorage.setItem("isLoggedIn", "true");
+
+navigate("/dashboard", { replace: true });
+  
     }
   };
 

@@ -63,9 +63,11 @@ const LoginPage = () => {
 
     // ================= GET SAVED USER =================
 
-    const savedUser = JSON.parse(
-      localStorage.getItem("user")
-    );
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+
+const savedUser = users.find(
+  (user) => user.email === email.trim()
+);
 
     // ================= ACCOUNT NOT FOUND =================
 
@@ -104,7 +106,7 @@ const LoginPage = () => {
 
     localStorage.setItem("isLoggedIn", "true");
 
-    navigate("/dashboard");
+    navigate("/dashboard" , {replace : true});
   };
 
   return (

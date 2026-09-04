@@ -9,17 +9,17 @@ import {
   Star,
 } from "lucide-react";
 
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   {
     name: "Home",
     icon: Home,
   },
-  {
+  /*{
     name: "Community",
     icon: Users,
-  },
+  },*/
   {
     name: "Watch History",
     icon: Clock3,
@@ -42,6 +42,14 @@ const socialItems = [
 ];
 
 export default function Sidebar() {
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    navigate("/", { replace: true });
+  };
+
   return (
     <aside className="fixed left-0 top-0 z-50 hidden h-screen w-[230px] border-r border-white/5 bg-[#29292f] lg:block">
 
@@ -115,12 +123,13 @@ export default function Sidebar() {
             Settings
           </button>
           
-          <Link to="/"
-           className="flex w-full items-center gap-4 rounded-md px-5 py-3 text-sm text-gray-300 transition hover:bg-white/5 hover:text-white">
+          <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-4 rounded-md px-5 py-3 text-sm text-gray-300 transition hover:bg-white/5 hover:text-white"
+            >
             <LogOut size={18} />
-            Log out
-          
-          </Link>
+               Log out
+             </button>
         </nav>
 
       </div>
