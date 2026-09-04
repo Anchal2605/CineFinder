@@ -1,11 +1,13 @@
+import { useState } from "react";
+
 import Sidebar from "./sideBar";
 import Navbar from "./Navbar";
 import HeroSection from "./heroSection";
 import MovieSection from "./movieSection";
 
-
-import { newMovies, continueWatching } from "./Data/movie";
 export default function Dashboard() {
+  const [selectedMovie, setSelectedMovie] = useState(null);
+
   return (
     <div className="min-h-screen bg-[#17171b] text-white">
 
@@ -19,22 +21,16 @@ export default function Dashboard() {
 
         <div className="pb-10">
 
-          <HeroSection />
+          {/* Hero Section */}
+          <HeroSection movie={selectedMovie} />
 
+          {/* Movies */}
           <MovieSection
-            title="New Movies"
-            movies={newMovies}
-          />
-
-          <MovieSection
-            title="Continue Watching"
-            movies={continueWatching}
-            continueWatching
+            onMovieSelect={setSelectedMovie}
           />
 
         </div>
 
-     
       </main>
 
     </div>
