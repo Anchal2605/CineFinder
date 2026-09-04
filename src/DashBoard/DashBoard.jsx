@@ -7,6 +7,8 @@ import MovieSection from "./movieSection";
 
 export default function Dashboard() {
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
 
   return (
     <div className="min-h-screen bg-[#17171b] text-white">
@@ -17,7 +19,10 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="min-h-screen lg:ml-[230px]">
 
-        <Navbar />
+        <Navbar
+        onSearch={setSearchQuery}
+        onMovieSelect={setSelectedMovie}
+             />
 
         <div className="pb-10">
 
@@ -27,6 +32,7 @@ export default function Dashboard() {
           {/* Movies */}
           <MovieSection
             onMovieSelect={setSelectedMovie}
+             searchQuery={searchQuery}
           />
 
         </div>
