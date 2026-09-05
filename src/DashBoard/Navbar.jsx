@@ -9,7 +9,11 @@ import { searchMovies } from "../services/movieApi";
 
 const navItems = ["TV Series", "Movies", "Animes", "Animations"];
 
-export default function Navbar({ onSearch, onMovieSelect }) {
+export default function Navbar({ 
+ onSearch,
+ onMovieSelect,
+ activeCategory,
+ onCategoryChange, }) {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -67,20 +71,24 @@ export default function Navbar({ onSearch, onMovieSelect }) {
     <header className="sticky top-0 z-40 flex h-[80px] items-center justify-between border-b border-white/5 bg-[#1f1f24]/95 px-5 backdrop-blur-md lg:px-8">
 
       {/* Navigation */}
-      <nav className="hidden items-center gap-8 md:flex">
-        {navItems.map((item) => (
-          <button
-            key={item}
-            className={`text-sm transition ${
-              item === "Movies"
-                ? "font-semibold text-[#ef3030]"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            {item}
-          </button>
-        ))}
-      </nav>
+<nav className="hidden items-center gap-8 md:flex">
+  {navItems.map((item) => (
+    <button
+      key={item}
+      onClick={() => {
+        onCategoryChange(item);
+        onSearch("");
+      }}
+      className={`text-sm transition ${
+        activeCategory === item
+          ? "font-semibold text-[#ef3030]"
+          : "text-gray-400 hover:text-white"
+      }`}
+    >
+      {item}
+    </button>
+  ))}
+</nav>
 
       {/* Right */}
       <div className="ml-auto flex items-center gap-3">

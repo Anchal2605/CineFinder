@@ -2,11 +2,21 @@ import { useEffect, useState } from "react";
 import {
   getPopularMovies,
   searchMovies,
+  getTVSeries,
+  getAnimationMovies,
+  getAnime,
+  getUpcomingMovies,
 } from "../services/movieApi";
 
 import MovieCard from "./movieCard";
 
-const MovieSection = ({ onMovieSelect, searchQuery }) => {
+const MovieSection = ({ 
+  onMovieSelect, 
+  searchQuery,
+  activeCategory,
+  watchHistory,
+  setWatchHistory,
+  }) => {
   const [movies, setMovies] = useState([]);
   const [error, setError] = useState("");
 
@@ -18,28 +28,56 @@ const MovieSection = ({ onMovieSelect, searchQuery }) => {
         let data;
 
         // Search hai to searched movies lao
-        if (searchQuery && searchQuery.trim() !== "") {
-          data = await searchMovies(searchQuery);
-        } else {
-          // Search empty hai to popular movies lao
-          data = await getPopularMovies();
-        }
+  if (activeCategory === "Watch History") {
+  data = watchHistory;
+  } else if (activeCategory === "Coming Soon") {
+   data = await getUpcomingMovies();
+  } else if (searchQuery && searchQuery.trim() !== "") {
+  // Search results
+  data = await searchMovies(searchQuery);
+
+} else if (activeCategory === "TV Series") {
+  data = await getTVSeries();
+
+} else if (activeCategory === "Animes") {
+  data = await getAnime();
+
+} else if (activeCategory === "Animations") {
+  data = await getAnimationMovies();
+
+} else if (activeCategory === "Popular"){
+  // Movies
+  data = await getPopularMovies();
+
+  data = data.filter((movie) => movie.vote_average >= 7);
+}
+
+else {
+  data = await getPopularMovies();
+}
 
         const formattedMovies = data.map((movie) => ({
           id: movie.id,
-          title: movie.title,
+          title: movie.title || movie.name,
 
-          image: movie.poster_path
-            ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-            : "",
+           image: movie.image || (
+           movie.poster_path
+           ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+           : ""
+            ),
 
-          cover: movie.backdrop_path
-            ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
-            : "",
+          cover: movie.cover || (
+          movie.backdrop_path
+          ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
+           : ""
+           ),
 
-          year: movie.release_date?.split("-")[0],
+          year:
+           movie.year ||
+           movie.release_date?.split("-")[0] ||
+           movie.first_air_date?.split("-")[0],
 
-          rating: movie.vote_average?.toFixed(1),
+         rating: movie.rating || movie.vote_average?.toFixed(1),
 
           overview: movie.overview,
         }));
@@ -62,17 +100,17 @@ const MovieSection = ({ onMovieSelect, searchQuery }) => {
     };
 
     fetchMovies();
-  }, [searchQuery, onMovieSelect]);
+  }, [searchQuery, activeCategory , onMovieSelect , watchHistory]);
 
   return (
     <section className="px-6 py-8">
 
       {/* Heading */}
-      <h2 className="mb-5 text-2xl font-bold text-white">
         {searchQuery && searchQuery.trim() !== ""
-          ? `Search Results for "${searchQuery}"`
-          : "Popular Movies"}
-      </h2>
+        ? `Search Results for "${searchQuery}"`
+        : activeCategory === "Movies"
+        ? "Popular Movies"
+        : activeCategory}
 
       {/* Error */}
       {error && (
@@ -91,7 +129,20 @@ const MovieSection = ({ onMovieSelect, searchQuery }) => {
             <MovieCard
               key={movie.id}
               movie={movie}
-              onMovieClick={onMovieSelect}
+              onMovieClick={(movie) => {
+                onMovieSelect(movie);
+
+           setWatchHistory((prev) => {
+           const alreadyWatched = prev.some(
+          (item) => item.id === movie.id
+             );
+         if (alreadyWatched) {
+         return prev;
+           }
+
+          return [movie, ...prev];
+           });
+              }}
             />
           ))}
 

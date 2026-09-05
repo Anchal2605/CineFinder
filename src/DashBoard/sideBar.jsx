@@ -41,8 +41,7 @@ const socialItems = [
   },
 ];
 
-export default function Sidebar() {
-
+export default function Sidebar({ onCategoryChange , activeCategory}) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -71,16 +70,33 @@ export default function Sidebar() {
           {menuItems.map((item, index) => {
             const Icon = item.icon;
 
+            const isActive =
+           (item.name === "Home" && activeCategory === "Movies") ||
+            item.name === activeCategory;
+
             return (
               <button
                 key={item.name}
+                onClick={() => {
+                  if (item.name === "Home") {
+                    onCategoryChange("Movies");
+                  }
+
+                  if (item.name === "Watch History") {
+                    onCategoryChange("Watch History");
+                  }
+
+                  if (item.name === "Coming Soon") {
+                   onCategoryChange("Coming Soon");
+                        }                    
+                }}
                 className={`group relative flex w-full items-center gap-4 rounded-md px-5 py-3 text-sm transition ${
-                  index === 0
+                  isActive
                     ? "bg-[#ef3030]/10 text-[#ef3030]"
                     : "text-gray-300 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                {index === 0 && (
+                {isActive && (
                   <span className="absolute left-0 h-9 w-1 rounded-r-full bg-[#ef3030]" />
                 )}
 
@@ -100,11 +116,23 @@ export default function Sidebar() {
           {socialItems.map((item) => {
             const Icon = item.icon;
 
+         const isActive = item.name === activeCategory;
             return (
               <button
                 key={item.name}
-                className="flex w-full items-center gap-4 rounded-md px-5 py-3 text-sm text-gray-300 transition hover:bg-white/5 hover:text-white"
+                onClick={() => {
+                   onCategoryChange(item.name)
+                }}
+                className={`group relative flex w-full items-center gap-4 rounded-md px-5 py-3 text-sm transition ${
+                  isActive
+              ? "bg-[#ef3030]/10 text-[#ef3030]"
+                 : "text-gray-300 hover:bg-white/5 hover:text-white"
+                  }`}
               >
+                {isActive && (
+               <span className="absolute left-0 h-9 w-1 rounded-r-full bg-[#ef3030]" />
+                   )}
+
                 <Icon size={18} strokeWidth={1.8} />
                 {item.name}
               </button>
@@ -118,18 +146,20 @@ export default function Sidebar() {
         </p>
 
         <nav className="space-y-2">
+
           <button className="flex w-full items-center gap-4 rounded-md px-5 py-3 text-sm text-gray-300 transition hover:bg-white/5 hover:text-white">
             <Settings size={18} />
             Settings
           </button>
-          
+
           <button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-4 rounded-md px-5 py-3 text-sm text-gray-300 transition hover:bg-white/5 hover:text-white"
-            >
+            onClick={handleLogout}
+            className="flex w-full items-center gap-4 rounded-md px-5 py-3 text-sm text-gray-300 transition hover:bg-white/5 hover:text-white"
+          >
             <LogOut size={18} />
-               Log out
-             </button>
+            Log out
+          </button>
+
         </nav>
 
       </div>
