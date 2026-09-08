@@ -147,10 +147,21 @@ export default function Sidebar({ onCategoryChange , activeCategory}) {
 
         <nav className="space-y-2">
 
-          <button className="flex w-full items-center gap-4 rounded-md px-5 py-3 text-sm text-gray-300 transition hover:bg-white/5 hover:text-white">
+          <button
+         onClick={() => onCategoryChange("Settings")}
+         className={`group relative flex w-full items-center gap-4 rounded-md px-5 py-3 text-sm transition ${
+          activeCategory === "Settings"
+           ? "bg-[#ef3030]/10 text-[#ef3030]"
+           : "text-gray-300 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+            {activeCategory === "Settings" && (
+              <span className="absolute left-0 h-9 w-1 rounded-r-full bg-[#ef3030]" />
+            )}
+
             <Settings size={18} />
             Settings
-          </button>
+            </button>
 
           <button
             onClick={handleLogout}

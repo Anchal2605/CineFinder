@@ -9,13 +9,15 @@ import { searchMovies } from "../services/movieApi";
 
 const navItems = ["TV Series", "Movies", "Animes", "Animations"];
 
-export default function Navbar({ 
- onSearch,
- onMovieSelect,
- activeCategory,
- onCategoryChange, }) {
+export default function Navbar({
+  onSearch,
+  onMovieSelect,
+  activeCategory,
+  onCategoryChange,
+}) {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedMovieIndex, setSelectedMovieIndex] = useState(-1);
 
   const handleSearch = async (e) => {
     const value = e.target.value;
@@ -27,6 +29,7 @@ export default function Navbar({
     if (!value.trim()) {
       setSuggestions([]);
       setShowSuggestions(false);
+      setSelectedMovieIndex(-1);
       return;
     }
 
@@ -35,10 +38,12 @@ export default function Navbar({
 
       setSuggestions(data.slice(0, 5));
       setShowSuggestions(true);
+      setSelectedMovieIndex(-1);
     } catch (error) {
       console.error("Suggestion error:", error);
       setSuggestions([]);
       setShowSuggestions(true);
+      setSelectedMovieIndex(-1);
     }
   };
 
@@ -65,30 +70,78 @@ export default function Navbar({
 
     // Suggestions close
     setShowSuggestions(false);
+    setSelectedMovieIndex(-1);
+  };
+
+  const handleKeyDown = (e) => {
+    if (!showSuggestions || suggestions.length === 0) {
+      return;
+    }
+
+    // Arrow Down
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+
+      setSelectedMovieIndex((prevIndex) => {
+        if (prevIndex === suggestions.length - 1) {
+          return 0;
+        }
+
+        return prevIndex + 1;
+      });
+    }
+
+    // Arrow Up
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+
+      setSelectedMovieIndex((prevIndex) => {
+        if (prevIndex <= 0) {
+          return suggestions.length - 1;
+        }
+
+        return prevIndex - 1;
+      });
+    }
+
+    // Enter
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      if (selectedMovieIndex >= 0) {
+        handleSuggestionClick(suggestions[selectedMovieIndex]);
+      }
+    }
+
+    // Escape
+    if (e.key === "Escape") {
+      setShowSuggestions(false);
+      setSelectedMovieIndex(-1);
+    }
   };
 
   return (
     <header className="sticky top-0 z-40 flex h-[80px] items-center justify-between border-b border-white/5 bg-[#1f1f24]/95 px-5 backdrop-blur-md lg:px-8">
 
       {/* Navigation */}
-<nav className="hidden items-center gap-8 md:flex">
-  {navItems.map((item) => (
-    <button
-      key={item}
-      onClick={() => {
-        onCategoryChange(item);
-        onSearch("");
-      }}
-      className={`text-sm transition ${
-        activeCategory === item
-          ? "font-semibold text-[#ef3030]"
-          : "text-gray-400 hover:text-white"
-      }`}
-    >
-      {item}
-    </button>
-  ))}
-</nav>
+      <nav className="hidden items-center gap-8 md:flex">
+        {navItems.map((item) => (
+          <button
+            key={item}
+            onClick={() => {
+              onCategoryChange(item);
+              onSearch("");
+            }}
+            className={`text-sm transition ${
+              activeCategory === item
+                ? "font-semibold text-[#ef3030]"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            {item}
+          </button>
+        ))}
+      </nav>
 
       {/* Right */}
       <div className="ml-auto flex items-center gap-3">
@@ -103,6 +156,7 @@ export default function Navbar({
               type="text"
               placeholder="Search the movie"
               onChange={handleSearch}
+              onKeyDown={handleKeyDown}
               onFocus={() => {
                 if (suggestions.length > 0) {
                   setShowSuggestions(true);
@@ -117,11 +171,15 @@ export default function Navbar({
             <div className="absolute right-0 top-12 z-50 w-[300px] overflow-hidden rounded-md border border-white/10 bg-[#29292f] shadow-xl">
 
               {suggestions.length > 0 ? (
-                suggestions.map((movie) => (
+                suggestions.map((movie, index) => (
                   <button
                     key={movie.id}
                     onClick={() => handleSuggestionClick(movie)}
-                    className="flex w-full items-center gap-3 px-3 py-3 text-left transition hover:bg-white/10"
+                    className={`flex w-full items-center gap-3 px-3 py-3 text-left transition ${
+                      selectedMovieIndex === index
+                        ? "bg-white/10"
+                        : "hover:bg-white/10"
+                    }`}
                   >
                     <img
                       src={
