@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { Link, useNavigate } from "react-router-dom";
+import { loginUser } from "../services/api";
 
 const LoginPage = () => {
   // Password show/hide
@@ -17,23 +18,26 @@ const LoginPage = () => {
   // Form values
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Error messages
   const [errors, setErrors] = useState({
     email: "",
     password: "",
+    general: "",
   });
 
   const navigate = useNavigate();
 
   // ================= FORM SUBMIT =================
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {
       email: "",
       password: "",
+      general: "",
     };
 
     // ================= EMAIL VALIDATION =================
@@ -61,52 +65,29 @@ const LoginPage = () => {
       return;
     }
 
-    // ================= GET SAVED USER =================
+    setLoading(true);
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    try {
+      const data = await loginUser(email, password);
 
-const savedUser = users.find(
-  (user) => user.email === email.trim()
-);
+      // Save token and user details
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("isLoggedIn", "true");
 
-    // ================= ACCOUNT NOT FOUND =================
-
-    if (!savedUser) {
-      setErrors({
-        email: "Account not found. Please sign up first.",
-        password: "",
-      });
-
-      return;
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      const errMsg = err.response?.data?.error || "Failed to log in. Please try again.";
+      if (errMsg.toLowerCase().includes("account not found")) {
+        setErrors({ email: errMsg, password: "", general: "" });
+      } else if (errMsg.toLowerCase().includes("incorrect password")) {
+        setErrors({ email: "", password: errMsg, general: "" });
+      } else {
+        setErrors({ email: "", password: "", general: errMsg });
+      }
+    } finally {
+      setLoading(false);
     }
-
-    // ================= EMAIL CHECK =================
-
-    if (email.trim() !== savedUser.email) {
-      setErrors({
-        email: "Account not found. Please sign up first.",
-        password: "",
-      });
-
-      return;
-    }
-
-    // ================= PASSWORD CHECK =================
-
-    if (password !== savedUser.password) {
-      setErrors({
-        email: "",
-        password: "Incorrect password",
-      });
-
-      return;
-    }
-
-    // ================= LOGIN SUCCESS =================
-
-    localStorage.setItem("isLoggedIn", "true");
-
-    navigate("/dashboard" , {replace : true});
   };
 
   return (
@@ -392,10 +373,17 @@ const savedUser = users.find(
 
                 </div>
 
+                {errors.general && (
+                  <div className="mb-4 p-3 bg-red-600/20 border border-red-600/40 rounded-lg text-red-400 text-sm">
+                    {errors.general}
+                  </div>
+                )}
+
                 {/* ================= LOGIN BUTTON ================= */}
 
                 <button
                   type="submit"
+                  disabled={loading}
                   className="
                     w-full
                     h-12
@@ -407,9 +395,10 @@ const savedUser = users.find(
                     transition
                     shadow-lg
                     shadow-red-950/30
+                    disabled:opacity-50
                   "
                 >
-                  Login
+                  {loading ? "Logging in..." : "Login"}
                 </button>
 
               </form>

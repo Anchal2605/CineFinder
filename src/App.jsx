@@ -4,7 +4,7 @@ import { Routes, Route } from 'react-router-dom'
 import LoginPage from './Pages/LoginPage'
 import LandingPage from './Pages/LandingPage'
 import Signup from './Pages/Signup'
-import ProtectedRoute from "./protectedRoute"
+import ProtectedRoute from "./ProtectedRoute"
 
 
 const App = () => {

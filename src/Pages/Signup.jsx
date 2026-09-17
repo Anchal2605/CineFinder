@@ -1,12 +1,14 @@
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { signupUser } from "../services/api";
 
 const Signup = () => {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Form data
   const [formData, setFormData] = useState({
@@ -31,7 +33,7 @@ const Signup = () => {
   };
 
   // Form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {};
@@ -70,34 +72,27 @@ const Signup = () => {
     // Show errors
     setErrors(newErrors);
 
-    // If no errors → Dashboard
+    // If no errors → Call API
     if (Object.keys(newErrors).length === 0) {
-      const userData = {
-    name: formData.name,
-    email: formData.email,
-    password: formData.password,
-  };
-    
-  const users = JSON.parse(localStorage.getItem("users")) || [];
+      setLoading(true);
+      try {
+        const data = await signupUser(formData.name, formData.email, formData.password);
+        
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("isLoggedIn", "true");
 
-const emailExists = users.some(
-  (users) => users.email === formData.email.trim()
-);
-
-if (emailExists) {
-  setErrors({
-    email: "An account with this email already exists.",
-  });
-  return;
-}
-
-users.push(userData);
-
-localStorage.setItem("users", JSON.stringify(users));
-localStorage.setItem("isLoggedIn", "true");
-
-navigate("/dashboard", { replace: true });
-  
+        navigate("/dashboard", { replace: true });
+      } catch (err) {
+        const errMsg = err.response?.data?.error || "Registration failed. Please try again.";
+        if (errMsg.toLowerCase().includes("email")) {
+          setErrors({ email: errMsg });
+        } else {
+          setErrors({ general: errMsg });
+        }
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -356,14 +351,20 @@ navigate("/dashboard", { replace: true });
                     {errors.terms}
                   </p>
                 )}
+                {errors.general && (
+                  <p className="mt-2 text-sm text-red-500">
+                    {errors.general}
+                  </p>
+                )}
               </div>
 
               {/* SIGNUP BUTTON */}
               <button
                 type="submit"
-                className="h-14 w-full rounded-xl bg-[#e50914] text-base font-semibold text-white transition hover:bg-red-700 hover:shadow-[0_0_25px_rgba(229,9,20,0.25)]"
+                disabled={loading}
+                className="h-14 w-full rounded-xl bg-[#e50914] text-base font-semibold text-white transition hover:bg-red-700 hover:shadow-[0_0_25px_rgba(229,9,20,0.25)] disabled:opacity-50"
               >
-                Create Account
+                {loading ? "Creating Account..." : "Create Account"}
               </button>
 
             </form>
