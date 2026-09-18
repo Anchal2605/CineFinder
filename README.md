@@ -78,51 +78,6 @@ Cine-Finder-React/
 └── package.json             # Frontend dependencies & scripts
 ```
 
-## Getting Started
-
-### Prerequisites
-
-- **Node.js** (v18 or above)
-- **MySQL** database
-- **TMDB API Key** — Get one at [themoviedb.org](https://www.themoviedb.org/settings/api)
-
-### Installation
-
-1. **Install frontend dependencies**
-   ```bash
-   npm install
-   ```
-
-2. **Install backend dependencies**
-   ```bash
-   cd server
-   npm install
-   cd ..
-   ```
-
-3. **Set up environment variables**
-
-   Create a `.env` file in the root directory:
-   ```env
-   VITE_TMDB_API_KEY=your_tmdb_api_key
-   ```
-
-   Create a `.env` file in the `server/` directory:
-   ```env
-   PORT=5000
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=your_mysql_password
-   DB_NAME=cinefinder
-   JWT_SECRET=your_jwt_secret_key
-   ```
-
-4. **Run the application**
-   ```bash
-   npm run dev
-   ```
-   This starts both the frontend (Vite) and backend (Express) concurrently.
-
 ## Available Scripts
 
 | Command              | Description                          |
